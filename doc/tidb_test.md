@@ -66,7 +66,7 @@ TiDB 分布式数据库将整体架构拆分成了多个模块，各模块之间
 
 本次测试使用三台虚拟机节点部署 Kubernetes 集群，包括 1 个 master 节点和 2 个 worker节点。Kubelete 版本为 1.22.0。
 
-![Kubernetes 集群](imgs/k8scluster.png)
+<img src="imgs/k8scluster.png" alt="Kubernetes 集群" style="zoom: 25%;" />
 
 ### HwameiStor 本地存储
 
@@ -124,7 +124,7 @@ TiDB 与 TiDB Operator 版本的对应关系如下：
 #### 部署 TiDB 集群
 
 ```
-kubectl create namespace tidb-cluster && \ 
+kubectl create namespace tidb-cluster && \
 kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com/pingcap/tidb-operator/master/examples/basic/tidb-cluster.yaml 
 kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com /pingcap/tidb-operator/master/examples/basic/tidb-monitor.yaml
 ```
@@ -136,13 +136,14 @@ kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com /pingcap/tidb
 yum -y install mysql-client
 ```
 
-![连接 TiDB 集群](imgs/connecttidb.png)
+<img src="imgs/connecttidb.png" alt="连接 TiDB 集群" style="zoom: 33%;" />
+
 ```
 kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out & 
 ```
 ![连接 TiDB 集群](imgs/connect1.png)
 
-![连接 TiDB 集群](imgs/connect2.png)
+<img src="imgs/connect2.png" alt="连接 TiDB 集群" style="zoom: 50%;" />
 
 ![连接 TiDB 集群](imgs/connect3.png)
 
@@ -160,14 +161,14 @@ kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out &
    ```
    select tidb_version()\G;
    ```
-   ![查询 TiDB 版本](imgs/checkversion.png)
+   <img src="imgs/checkversion.png" alt="查询 TiDB 版本" style="zoom: 50%;" />
 
 3. 查询 Tikv 存储状态
 
    ```
    select * from information_schema.tikv_store_status\G;
    ```
-   ![查询 Tikv 存储状态](imgs/checkstorage.png)
+   <img src="imgs/checkstorage.png" alt="查询 Tikv 存储状态" style="zoom:50%;" />
 
 
 #### HwameiStor 存储配置
@@ -176,17 +177,19 @@ kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out &
 
 ![HwameiStor 存储配置](imgs/pvc.png)
 
-![HwameiStor 存储配置](imgs/pvc1.png)
+<img src="imgs/pvc1.png" alt="HwameiStor 存储配置" style="zoom: 50%;" />
 
-![HwameiStor 存储配置](imgs/pvc2.png)
+<img src="imgs/pvc2.png" alt="HwameiStor 存储配置" style="zoom: 67%;" />
+
 ```
 kubectl get po basic-tikv-0 -oyaml
 ```
-![HwameiStor 存储配置](imgs/mountpvc.png)
+<img src="imgs/mountpvc.png" alt="HwameiStor 存储配置" style="zoom:50%;" />
+
 ```
 kubectl get po basic-pd-0 -oyaml
 ```
-![HwameiStor 存储配置](imgs/mountpvc1.png)
+<img src="imgs/mountpvc1.png" alt="HwameiStor 存储配置" style="zoom:50%;" />
 
 ## 测试内容
 
@@ -225,5 +228,5 @@ kubectl get po basic-pd-0 -oyaml
 |数据导入导出|通过|
 |慢日志查询|通过|
 
-有关测试详情，参考[TiDB on hwameiStor 部署及测试记录]()。
+有关测试详情，参考[TiDB on hwameiStor部署及测试记录](TiDBonHwameiStor.docx)。
 
