@@ -23,3 +23,6 @@ For the traditional shared storage:
 StatefulSet will deploy replicas to the other work nodes for workload distribution and will also create a pv data volume for each of replicas.
 
 Deployment will also deploy replicas to the other work nodes for workload distribution, but will share the same pv data volume (only for NFS). We suggest to use a single pod for block storage because the block data volumes can not be shared.
+
+
+END.
