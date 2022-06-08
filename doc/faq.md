@@ -2,7 +2,7 @@
 
 ### 问题 1：HwameiStor 本地存储调度器 scheduler 在 kubernetes 平台中是如何工作的？ 
 
-HwameiStor 的调度器是以 pod 的形式部署在 HwameiStor 的命名空间。
+HwameiStor 的调度器是以 pod 的形式部署在 HwameiStor 的命名空间
 
 ![img](images/clip_image002.png)
 
