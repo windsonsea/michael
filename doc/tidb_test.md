@@ -66,7 +66,7 @@ TiDB 分布式数据库将整体架构拆分成了多个模块，各模块之间
 
 本次测试使用三台虚拟机节点部署 Kubernetes 集群，包括 1 个 master 节点和 2 个 worker节点。Kubelete 版本为 1.22.0。
 
-<img src="imgs/k8scluster.png" alt="Kubernetes 集群" style="zoom: 25%;" />
+<img src="imgs/k8scluster.png" style="zoom:50%;" />
 
 ### HwameiStor 本地存储
 
@@ -76,9 +76,9 @@ TiDB 分布式数据库将整体架构拆分成了多个模块，各模块之间
 
 2. 在两台 worker 节点上分别为 HwameiStor 配置一块 100G 的本地磁盘 sdb
 
-   ![配置本地磁盘](imgs/sdb1.png)
+   <img src="imgs/sdb1.png" alt="配置本地磁盘" style="zoom:35%;" />
 
-   ![配置本地磁盘](imgs/sdb2.png)
+   <img src="imgs/sdb2.png" alt="配置本地磁盘" style="zoom:40%;" />
 
 3. 创建 storagClass
 
@@ -102,13 +102,13 @@ TiDB 与 TiDB Operator 版本的对应关系如下：
 
 1. 安装 TiDB CRDs
 
-   ```
+   ```bash
    kubectl apply -f https://raw.githubusercontent.com/pingcap/tidb-operator/master/manifests/crd.yaml
    ```
 
 2. 安装 TiDB Operator
 
-   ```
+   ```bash
    helm repo add pingcap https://charts.pingcap.org/ 
    kubectl create namespace tidb-admin 
    helm install --namespace tidb-admin tidb-operator pingcap/tidb-operator --version v1.3.2 \
@@ -123,7 +123,7 @@ TiDB 与 TiDB Operator 版本的对应关系如下：
 
 #### 部署 TiDB 集群
 
-```
+```bash
 kubectl create namespace tidb-cluster && \
 kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com/pingcap/tidb-operator/master/examples/basic/tidb-cluster.yaml 
 kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com /pingcap/tidb-operator/master/examples/basic/tidb-monitor.yaml
@@ -132,18 +132,18 @@ kubectl -n tidb-cluster apply -f https://raw.githubusercontent.com /pingcap/tidb
 
 #### 连接 TiDB 集群
 
-```
+```bash
 yum -y install mysql-client
 ```
 
-<img src="imgs/connecttidb.png" alt="连接 TiDB 集群" style="zoom: 33%;" />
+<img src="imgs/connecttidb.png" alt="连接 TiDB 集群" />
 
-```
+```bash
 kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out & 
 ```
 ![连接 TiDB 集群](imgs/connect1.png)
 
-<img src="imgs/connect2.png" alt="连接 TiDB 集群" style="zoom: 50%;" />
+<img src="imgs/connect2.png" alt="连接 TiDB 集群" style="zoom: 60%;" />
 
 ![连接 TiDB 集群](imgs/connect3.png)
 
@@ -151,7 +151,7 @@ kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out &
 
 1. 创建 Hello_world 表
 
-   ```
+   ```sql
    create table hello_world (id int unsigned not null auto_increment primary key, v varchar(32)); 
    ```
    ![创建 Hello_world 表](imgs/helloworld.png)
@@ -161,15 +161,14 @@ kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out &
    ```
    select tidb_version()\G;
    ```
-   <img src="imgs/checkversion.png" alt="查询 TiDB 版本" style="zoom: 50%;" />
+   <img src="imgs/checkversion.png" alt="查询 TiDB 版本" style="zoom:50%;" />
 
 3. 查询 Tikv 存储状态
 
-   ```
+   ```sql
    select * from information_schema.tikv_store_status\G;
    ```
    <img src="imgs/checkstorage.png" alt="查询 Tikv 存储状态" style="zoom:50%;" />
-
 
 #### HwameiStor 存储配置
 
@@ -177,56 +176,336 @@ kubectl port-forward -n tidb-cluster svc/basic-tidb 4000 > pf4000.out &
 
 ![HwameiStor 存储配置](imgs/pvc.png)
 
-<img src="imgs/pvc1.png" alt="HwameiStor 存储配置" style="zoom: 50%;" />
+<img src="imgs/pvc1.png" alt="HwameiStor 存储配置" style="zoom:55%;" />
 
-<img src="imgs/pvc2.png" alt="HwameiStor 存储配置" style="zoom: 67%;" />
+<img src="imgs/pvc2.png" alt="HwameiStor 存储配置" style="zoom:80%;" />
 
-```
+```bash
 kubectl get po basic-tikv-0 -oyaml
 ```
-<img src="imgs/mountpvc.png" alt="HwameiStor 存储配置" style="zoom:50%;" />
+<img src="imgs/mountpvc.png" alt="HwameiStor 存储配置" style="zoom:60%;" />
 
-```
+```bash
 kubectl get po basic-pd-0 -oyaml
 ```
-<img src="imgs/mountpvc1.png" alt="HwameiStor 存储配置" style="zoom:50%;" />
+<img src="imgs/mountpvc1.png" alt="HwameiStor 存储配置" style="zoom:60%;" />
 
 ## 测试内容
 
 ### 数据库 SQL 基本能力测试
 
-|测试项|测试结果|
-|:---|:---|
-|分布式事务|通过|
-|对象隔离|通过|
-|表操作支持（创建删除/表数据 DML/列修改增加删除/分区表）|通过|
-|索引支持|通过|
-|表达式|通过|
-|执行计划解析|通过|
-|执行计划绑定|通过|
-|常用函数|通过|
-|显式/隐式事务|通过|
-|字符集|通过|
-|锁支持|通过|
-|隔离级别|通过|
-|分布式复杂查询|通过|
+完成部署数据库集群后，执行了以下基本能力测试，全部通过。
+
+#### 分布式事务
+
+测试目的：支持在多种隔离级别下，实现分布式数据操作的完整性约束即 ACID属性
+
+测试步骤：
+1.	创建测试数据库 CREATE DATABASE testdb;
+2.	创建测试用表 CREATE TABLE t_test ( `id` int AUTO_INCREMENT, `name` varchar(32), PRIMARY KEY (id) );
+3.	运行测试脚本
+
+测试结果：支持在多种隔离级别下，实现分布式数据操作的完整性约束即 ACID 属性
+
+#### 对象隔离
+
+测试目的：测试不同 schema 实现对象隔离
+
+测试脚本：
+```sql
+create database if not exists testdb;
+use testdb
+create table if not exists t_test
+( id                   bigint,
+  name                 varchar(200),
+  sale_time            datetime default current_timestamp,
+  constraint pk_t_test primary key (id)
+);
+insert into t_test(id,name) values (1,'a'),(2,'b'),(3,'c');
+create user 'readonly'@'%' identified by "readonly";
+grant select on testdb.* to readonly@'%';
+select * from testdb.t_test;
+update testdb.t_test set name='aaa';
+create user 'otheruser'@'%' identified by "otheruser";
+```
+
+测试结果：支持创建不同 schema 实现对象隔离
+
+#### 表操作支持
+
+测试目的：测试是否支持创建、删除和修改表数据、DML、列、分区表
+
+测试步骤：连接数据库后按步骤执行测试脚本
+
+测试脚本：
+
+```sql
+# 创建和删除表
+drop table if exists t_test;
+create table if not exists t_test
+( id                   bigint default '0',
+  name                 varchar(200) default '' ,
+  sale_time            datetime default current_timestamp,
+  constraint pk_t_test primary key (id)
+);
+# 删除和修改
+insert into t_test(id,name) values (1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e');
+update t_test set name='aaa' where id=1;
+update t_test set name='bbb' where id=2;
+delete from t_dml where id=5;
+# 修改、增加、删除列
+alter table t_test modify column name varchar(250);
+alter table t_test add column col varchar(255);
+insert into t_test(id,name,col) values(10,'test','new_col');     
+alter table t_test add column colwithdefault varchar(255) default 'aaaa';
+insert into t_test(id,name) values(20,'testdefault');
+insert into t_test(id,name,colwithdefault ) values(10,'test','non-default ');     
+alter table t_test drop column colwithdefault;
+# 分区表类型（仅摘录部分脚本）
+CREATE TABLE employees (
+    id INT NOT NULL,
+fname VARCHAR(30),
+lname VARCHAR(30),
+    hired DATE NOT NULL DEFAULT '1970-01-01',
+    separated DATE NOT NULL DEFAULT '9999-12-31',
+job_code INT NOT NULL,
+store_id INT NOT NULL
+)
+```
+
+测试结果：支持创建、删除和修改表数据、DML、列、分区表
+
+#### 索引支持
+
+测试目的：验证多种类型的索引（唯一、聚簇、分区、Bidirectional indexes、Expression-based indexes、哈希索引等等）以及索引重建操作。
+
+测试脚本：
+
+```sql
+alter table t_test add unique index udx_t_test (name);
+# 默认就是主键聚簇索引
+ADMIN CHECK TABLE t_test;
+create index time_idx on t_test(sale_time);
+alter table t_test drop index time_idx;
+admin show ddl jobs;
+admin show ddl job queries 156;
+create index time_idx on t_test(sale_time);
+```
+
+测试结果：支持创建、删除、组合、单列、唯一索引
+
+#### 表达式
+
+测试目的：验证分布式数据库的表达式支持 if、casewhen、forloop、whileloop、loop exit when 等语句（上限 5 类）
+
+前提条件：数据库集群已经部署完成。
+
+测试脚本：
+
+```sql
+SELECT CASE id WHEN 1 THEN 'first' WHEN 2 THEN 'second' ELSE 'OTHERS' END AS id_new  FROM t_test;
+SELECT IF(id>2,'int2+','int2-') from t_test;
+
+```
+
+测试结果：支持 if、case when、for loop、while loop、loop exit when 等语句（上限 5 类）
+
+#### 执行计划解析
+
+测试目的：验证分布式数据库的执行计划解析支持
+
+前提条件：数据库集群已经部署完成。
+
+测试脚本：
+
+```sql
+explain analyze select * from t_test where id NOT IN (1,2,4);
+explain analyze select * from t_test a where EXISTS (select * from t_test b where a.id=b.id and b.id<3);
+explain analyze SELECT IF(id>2,'int2+','int2-') from t_test;
+```
+
+测试结果：支持执行计划的解析
+
+#### 执行计划绑定
+
+测试目的：验证分布式数据库的执行计划绑定功能
+
+测试步骤：
+
+1. 查看 sql 语句的当前执行计划
+2. 使用绑定特性
+3. 查看该 sql 语句绑定后的执行计划
+4. 删除绑定
+
+测试脚本：
+
+```sql
+explain select * from employees3 a join employees4 b on a.id = b.id where a.lname='Johnson';
+explain select /*+ hash_join(a,b) */ * from employees3 a join employees4 b on a.id = b.id where a.lname='Johnson';
+```
+
+测试结果：没有使用 hint 时可能不是 hash_join，使用 hint 后一定是 hash_join。
+
+#### 常用函数
+
+测试目的：验证分布式数据库的标准的数据库函数(支持的函数类型）
+
+测试结果：支持标准的数据库函数
+
+#### 显式/隐式事务
+
+测试目的：验证分布式数据库的事务支持
+
+测试结果：支持显示与隐式事务
+
+#### 字符集
+
+测试目的：验证分布式数据库的数据类型支持
+
+测试结果：目前只支持 UTF-8 mb4 字符集
+
+#### 锁支持
+
+测试目的：验证分布式数据库的锁实现
+
+测试结果：描述了锁的实现方式，R-R/R-W/W-W 情况下阻塞情况，死锁处理方式
+
+#### 隔离级别
+
+测试目的：验证分布式数据库的事务隔离级别
+
+测试结果：支持 si 隔离级别，支持 rc 隔离级别（4.0 GA 版本）
+
+#### 分布式复杂查询
+
+测试目的：验证分布式数据库的分布式复杂查询能力
+
+测试结果：支持跨节点 join 等分布式复杂查询、操作等，支持窗口函数、层次查询
 
 ### 系统安全测试
 
-|测试项|测试结果 |
-|:---|:---|
-|账号管理与权限测试|通过|
-|数据隔离|通过|
-|访问控制|通过|
-|白名单|通过|
-|操作日志记录|通过|
+这部分测试系统安全，完成数据库集群部署后，以下安全测试全部通过。
+
+#### 账号管理与权限测试
+
+测试目的：验证分布式数据库的账号权限管理
+
+测试脚本：
+
+```sql
+select host,user,authentication_string from mysql.user;
+create user tidb IDENTIFIED by 'tidb'; 
+select host,user,authentication_string from mysql.user;
+set password for tidb =password('tidbnew');
+select host,user,authentication_string,Select_priv from mysql.user;
+grant select on *.* to tidb;
+flush privileges ;
+select host,user,authentication_string,Select_priv from mysql.user;
+grant all privileges on *.* to tidb;
+flush privileges ;
+select * from  mysql.user where user='tidb';
+revoke select on *.* from tidb; 
+flush privileges ;
+revoke all privileges on *.* from tidb;
+flush privileges ;
+grant select(id) on test.TEST_HOTSPOT to tidb;
+drop user tidb;
+```
+
+测试结果：
+
+- 支持创建、修改删除账号，并配置和密码，支持安全、审计和数据管理三权分立
+- 根据不同账号，对数库各个级别权限控制包括：实例/库/表/列级别
+
+#### 访问控制
+
+测试目的：验证分布式数据库的权限访问控制，数据库数据通过赋予基本增删改查访问权限控制
+
+测试脚本：
+
+```sql
+mysql -u root -h 172.17.49.222 -P 4000
+drop user tidb;
+drop user tidb1;
+create user tidb IDENTIFIED by 'tidb'; 
+grant select on tidb.* to tidb;
+grant insert on tidb.* to tidb;
+grant update on tidb.* to tidb;
+grant delete on tidb.* to tidb;
+flush privileges;
+show grants for tidb;
+exit;
+mysql -u tidb -h 172.17.49.222 -ptidb -P 4000 -D tidb -e 'select * from aa;'
+mysql -u tidb -h 172.17.49.222 -ptidb -P 4000 -D tidb -e 'insert into aa values(2);'
+mysql -u tidb -h 172.17.49.222 -ptidb -P 4000 -D tidb -e 'update aa set id=3;'
+mysql -u tidb -h 172.17.49.222 -ptidb -P 4000 -D tidb -e 'delete from aa where id=3;'
+```
+
+测试结果：数据库数据通过赋予基本增删改查访问权限控制。
+
+#### 白名单
+
+测试目的：验证分布式数据库的白名单功能
+
+测试脚本：
+
+```sql
+mysql -u root -h 172.17.49.102 -P 4000
+drop user tidb;
+create user tidb@'127.0.0.1' IDENTIFIED by 'tidb'; 
+flush privileges;
+select * from mysql.user where user='tidb';
+mysql -u tidb -h 127.0.0.1 -P 4000 -ptidb
+mysql -u tidb -h 172.17.49.102 -P 4000 -ptidb
+```
+
+测试结果：支持 IP 白名单功能，支持 IP 段通配操作
+
+#### 操作日志记录
+
+测试目的：验证分布式数据库的操作监控能力
+
+测试脚本：`kubectl -ntidb-cluster logs tidb-test-pd-2 --tail 22`
+
+测试结果：记录用户通过运维管理控制台或者 API 执行的关键操作或者错误操作
 
 ### 运维管理测试
 
-|测试项|测试结果|
-|:---|:---|
-|数据导入导出|通过|
-|慢日志查询|通过|
+这部分测试系统运维，完成数据库集群部署后，以下运维管理测试全部通过。
 
-有关测试详情，参考[TiDB on hwameiStor部署及测试记录](TiDBonHwameiStor.docx)。
+#### 数据导入导出
 
+测试目的：验证分布式数据库的数据导入导出的工具支持
+
+测试脚本：
+
+```sql
+select * from sbtest1 into outfile '/sbtest1.csv';
+load data local infile '/sbtest1.csv' into table test100;
+```
+
+测试结果：支持按表、schema、database 级别的逻辑导出导入
+
+#### 慢日志查询
+
+测试目的：获取慢查询的 SQL 信息
+
+前提条件：SQL 执行时间需大于配置的慢查询记录阈值,且 SQL 执行完毕
+
+测试步骤：
+
+1. 调整慢查询阈值到 100ms
+2. 执行 sql
+3. 查看 log/系统表/dashboard 中的慢查询信息
+
+测试脚本：
+
+```sql
+show variables like 'tidb_slow_log_threshold';
+set tidb_slow_log_threshold=100;
+select query_time, query from information_schema.slow_query where is_internal = false order by query_time desc limit 3;
+```
+
+测试结果：可以获取慢查询信息
+
+有关测试详情，参考 [TiDB on hwameiStor 部署及测试记录](TiDBonHwameiStor.docx)。
